@@ -54,9 +54,6 @@
 'LI7500RS                   -> User constants and wiring: "LI7500RS user constants / wiring"
 '                           -> Internal constants, variables and tables: "LI7500RS internal constants / variables / tables"
 
-'Soil moisture              -> User constants and wiring: "Soil moisture user constants / wiring"
-'                           -> Internal variables: "Soil moisture internal variables"
-
 'Rain gauge                 -> User constants and wiring: "Rain gauge user constants / wiring"
 '                           -> Internal variables: "Rain gauge internal variables"
 
@@ -64,10 +61,10 @@
 '                           -> Internal variables: "Soil heat flux internal variables"
 
 'Soil temperature           -> User constants / wiring: "Soil temperature user constants / wiring"
-'                           -> Internal constants and variables: "Soil temperature internal variables / tables"
+'                           -> Internal constants and variables: "Soil temperature internal variables / tables" 
 
-'Ancillary pressure sensor  -> User constants and wiring: "Barometric pressure user constants / wiring"
-'                           -> Internal variables: "Barometric pressure internal variables"
+'Soil moisture              -> User constants and wiring: "Soil moisture user constants / wiring"
+'                           -> Internal variables: "Soil moisture constants and variables"
 
 'Air temperature / humidity -> User constants and wiring: "T and RH user constants / wiring"
 '                           -> Internal variables and tables: "T and RH internal variables / tables"
@@ -85,7 +82,7 @@
 
 ' -> Station-based user constants
 
-Const STATION_NAME = "TiTreeEast_EC"
+Const STATION_NAME = "HowardSprings_EC"
 Const PAKBUS_ADDR = 1
 
 ' -> General user constants
@@ -100,14 +97,14 @@ Const OUTPUT_INTERVAL = 30            ' Unique value, online flux data output in
 
 Const CDMVOLT116_1_SN = 4634              ' CDM-VOLT116 serial number
 Const CDMVOLT116_1_ADDR = 1               ' CDM-VOLT116 CPI address
-Const CDMVOLT116_1_DESC = "MUX_1"         ' CDM-VOLT116 descriptor
+Const CDMVOLT116_1_DESC = "Main_MUX"      ' CDM-VOLT116 descriptor
 
-' -> CSAT3B user constants / wiring (CR1000X -> note that CSAT and IRGA signals
-'    are combined at top of mast and brought down to logger on a single cable
+' -> CSAT3B user constants / wiring (CR1000X -> note that CSAT and IRGA signals 
+'    are combined at top of mast and brought down to logger on a single cable 
 '    for tall towers; as such, wiring colours may vary for cabling used).
 
 Const CSAT3B_SDM_ADDR = 3          ' CSAT3B SDM address
-Const AZ_SONIC = 124               ' CSAT3B azimuth
+Const AZ_SONIC = 344               ' CSAT3B azimuth
 
 'SDM-C1  SDM Data (green)
 'SDM-C2  SDM Clock (white)
@@ -134,68 +131,9 @@ Const IRGA_SIG_STR_THRESHOLD = 60  ' Unique value - filter LI-7500(RS) data with
 'G       power reference (red with black/black)
 '        ground (green/not used)
 
-' -> Rain gauge user constants / wiring (CR1000X)
-
-'Note: for the CR1000X and CR1000X, triggering conflicts may occur when a companion terminal is used for
-'a triggering instruction such As TimerInput(), PulseCount(), OR WaitDigTrig(). For
-'example, If the WindSonic4 Is connected To C3 on a CR1000X, C4 cannot be used in the
-'TimerInput(), PulseCount(), OR WaitDigTrig() instructions. Hence, we put the pulse port at U3.
-
-Const RAIN_PULSE_INPUT = P1        'Unique pulse input channel for tipping bucket.
-Const RAIN_CAL = 0.2               'Unique multiplier for tipping bucket.
-
-'P1      Signal (black)
-'G       Signal reference (white)
-'        Shield (clear)
-
-' -> Soil heat flux user constants / wiring (CR1000X - read calibration coefficients into memory on compile)
-
-Const SHF_ANALOG_INPUT = 1            'Unique differential analog input channel for plate
-Const NMBR_SHF = 1                    'n plates
-Const SHF_FIELDS = "Fg_01"            'Field names
-Const SHF_CAL = 1000 / 62.34          'Unique multiplier for HFP #1 (1000/sensitivity).
-
-'HFP01 #1 S/N 24806
-'1H      Heat flux plate signal (white)
-'1L      Heat flux plate signal reference (green)
-'gnd     Shield (clear)
-
-' -> Barometric pressure user constants / wiring (CR1000X)
-
-Const PS_ANALOG_INPUT = 2             'Unique differential analog input channel.
-Const PS_MULT = 0.24
-Const PS_OFFSET = 500
-
-'CS106
-'2H      Barometric pressure sensor signal (blue)
-'2L      Barometric pressure sensor signal reference (yellow)
-'gnd     Shield (clear)
-
-' -> Soil temperature user constants / wiring (CR1000X)
-
-Const TSOIL_ANALOG_INPUT = 3          'Unique differential analog input channel.
-Const NMBR_TSOIL = 1                  'n sensors
-
-'TCAV1
-'3H      Signal #1 (purple)
-'3L      Signal reference #1 (red)
-'gnd     Shield #1 (clear)
-
 ' -> Soil moisture user constants / wiring (CR1000X)
 
-Const NMBR_CS65X = 1                  'Number of CS65X to measure.
-Const CS65X_SDI12_PORT = C5           'Measurement port.
-Const CS65X_1_ADDR = 1                'Address for this probe.
-
-'Search for text "Duplicate above for additional probes." to add code for additional probes.
-
-'C5      SDI-12 data #1 (green)
-'G       RS-232 Rx #1 (orange)
-'12V     SDI-12 power #1 (red)
-'G       SDI-12 data/power reference #1 (black)
-'        Shield (clear)
-
-Const NMBR_CS616 = 4               'n sensors
+Const NMBR_CS616 = 8               'n sensors
 Const VWC_ANALOG_INPUT = 7         'Unique single-ended analog input channel.
 
 'CS616 1
@@ -226,6 +164,81 @@ Const VWC_ANALOG_INPUT = 7         'Unique single-ended analog input channel.
 'G       Power reference (black)
 'G       Shield (clear)
 
+'CS616 5
+'6H      Soil moisture signal (green)
+'5V      Control (orange)
+'12V     Power (red)
+'G       Power reference (black)
+'G       Shield (clear)
+
+'CS616 6
+'6L      Soil moisture signal (green)
+'5V      Control (orange)
+'12V     Power (red)
+'G       Power reference (black)
+'G       Shield (clear)
+
+'CS616 7
+'7H      Soil moisture signal (green)
+'5V      Control (orange)
+'12V     Power (red)
+'G       Power reference (black)
+'G       Shield (clear)
+
+'CS616 8
+'7L      Soil moisture signal (green)
+'5V      Control (orange)
+'12V     Power (red)
+'G       Power reference (black)
+'G       Shield (clear)
+
+' -> Rain gauge user constants / wiring (CR1000X)
+
+'Note: for the CR1000X and CR1000X, triggering conflicts may occur when a companion terminal is used for
+'a triggering instruction such As TimerInput(), PulseCount(), OR WaitDigTrig(). For
+'example, If the WindSonic4 Is connected To C3 on a CR1000X, C4 cannot be used in the
+'TimerInput(), PulseCount(), OR WaitDigTrig() instructions. Hence, we put the pulse port at U3.
+
+Const RAIN_PULSE_INPUT = P1        'Unique pulse input channel for tipping bucket.
+Const RAIN_CAL = 0.2               'Unique multiplier for tipping bucket.
+
+'P1      Signal (black)
+'G       Signal reference (white)
+'        Shield (clear)
+
+' -> Soil heat flux user constants / wiring (CR1000X - read calibration coefficients into memory on compile)
+
+Const SHF_ANALOG_INPUT = 1            'Unique single-ended analog input channel.
+Const NMBR_SHF = 2                    'n plates
+Const SHF_FIELDS = "Fg_01,Fg_02"      'Field names
+Const SHF_CAL_1 = 31.9                'Unique multiplier for HFP #1 (REBS HFT S/N H033260).
+Const SHF_CAL_2 = 32.2                'Unique multiplier for HFP #2 (REBS HFT S/N H033258).
+Data SHF_CAL_1
+Data SHF_CAL_2
+
+'HFP01 #1
+'1H      Signal (white)
+'1L     Signal reference (green)
+'gnd     Shield (clear)
+'HFP01 #2
+'2H      Signal (white)
+'2L     Signal reference (green)
+'gnd     Shield (clear)
+
+' -> Soil temperature user constants / wiring (CR1000X)
+
+Const TSOIL_ANALOG_INPUT = 3          'Unique differential analog input channel.
+Const NMBR_TSOIL = 1                  'n sensors
+
+'TCAV1
+'3H      Signal #1 (purple)
+'3L      Signal reference #1 (red)
+'gnd     Shield #1 (clear)
+'TCAV2
+'4H      Signal #2 (purple)
+'4L      Signal reference #2 (red)
+'gnd     Shield #2 (clear)
+
 ' -> T and RH user constants / wiring (VOLT116)
 
 Const T_RH_MAIN_INPUT = 1          'Unique differential input channel for temperature and humidity probe.
@@ -235,10 +248,10 @@ Const T_RH_RH_MULT = 0.1           'Unique multiplier for rh; HC2S3 = ?, HMP155A
 Const T_RH_RH_OFFSET = 0           'Unique offset for rh; HC2S3 = ?, HMP155A = 0, or HMP45C = ?.
 
 '1H      Temperature signal (yellow)
-'1L      Temperature signal reference (white)  --> Jumper to 2L
+'1L      Temperature signal reference (orange in loop with 11L, was purple, was white)  --> Jumper to white
 'gnd     Shield
 '2H      RH signal (blue)
-'2L      RH signal reference (white)  --> Jumper from 1L
+'2L      RH signal reference (orange, was purple, was white)
 '12V     Power (red)
 'G       Power reference (black)
 
@@ -257,32 +270,41 @@ Const T_RH_2M_INPUT = 8            'Unique differential input channel
 Const NR_ANALOG_INPUT = 3                'Unique differential analog input channel for raw measurements
 Const NR_TSENS_ANALOG_INPUT = 13         'Unique single-ended analog input channel for body T
 Const NR_TSENS_VX = X1                   'Unique voltage excitation channel for thermistor
-Const NR_SW_INCOMING_CAL = 1000/15.50    'Unique multiplier for CNR 4 shortwave incoming radiation (1000/sensitivity).
-Const NR_SW_OUTGOING_CAL = 1000/14.43    'Unique multiplier for CNR 4 shortwave outgoing radiation (1000/sensitivity).
-Const NR_LW_INCOMING_CAL = 1000/8.78     'Unique multiplier for CNR 4 longwave incoming radiation (1000/sensitivity).
-Const NR_LW_OUTGOING_CAL = 1000/7.70     'Unique multiplier for CNR 4 longwave outgoing radiation (1000/sensitivity).
+Const NR_SW_INCOMING_CAL = 1000/12.71    'Unique multiplier for CNR 4 shortwave incoming radiation (1000/sensitivity).
+Const NR_SW_OUTGOING_CAL = 1000/12.98    'Unique multiplier for CNR 4 shortwave outgoing radiation (1000/sensitivity).
+Const NR_LW_INCOMING_CAL = 1000/8.75     'Unique multiplier for CNR 4 longwave incoming radiation (1000/sensitivity).
+Const NR_LW_OUTGOING_CAL = 1000/9.00     'Unique multiplier for CNR 4 longwave outgoing radiation (1000/sensitivity).
 
 '3H      Incoming shortwave radiation signal (red)
 '3L      Incoming shortwave radiation signal reference (blue)
 'gnd     Shield (clear)
+'        short jumper wire to 5L
 '4H      Outgoing shortwave radiation signal (white)
 '4L      Outgoing shortwave radiation signal reference (black)
+'gnd     short jumper wire to 6L
 '5H      Incoming longwave radiation signal (gray)
 '5L      Incoming longwave radiation signal reference (yellow)
+'gnd     short jumper wire to 7L
 '6H      Outgoing longwave radiation signal (brown)
 '6L      Outgoing longwave radiation signal reference (green)
+'gnd     short jumper wire to 5L
 '7H      Thermistor signal (white)
 'gnd     Thermistor signal reference (black)
 '        Shield (clear)
 'X1      Thermistor excitation (red)
 
-' -> quantum sensor incoming user constants / wiring
+' -> quantum sensor user constants / wiring
 
 Const PAR_ANALOG_INPUT = 10
-Const PAR_MULT = 5
+Const PAR_CAL_1 = 237.76
+Const PAR_CAL_2 = 146.94
 
 '10H     Incoming photosynthetically active radiation signal (red)
 '10L     Incoming photosynthetically active radiation signal reference (black)
+'gnd     Analog gnd (white)
+'gnd     Shield (clr)
+'11H     Incoming photosynthetically active radiation signal (red)
+'11L     Incoming photosynthetically active radiation signal reference (black)
 'gnd     Analog gnd (white)
 'gnd     Shield (clr)
 
@@ -558,16 +580,16 @@ Units rain = mm
 ' Variables
 
 Public tmpr_rh(3)
-Alias tmpr_rh(1) = Ta_sensor                     'Temperature/humidity probe temperature.
-Alias tmpr_rh(2) = RH_sensor                     'Temperature/humidity probe relative humidity.
-Alias tmpr_rh(3) = e_sensor                      'Temperature/humidity probe vapor pressure.
+Alias tmpr_rh(1) = Ta_sensor                    'Temperature/humidity probe temperature.
+Alias tmpr_rh(2) = RH_sensor                    'Temperature/humidity probe relative humidity.
+Alias tmpr_rh(3) = e_sensor                     'Temperature/humidity probe vapor pressure.
 Units Ta_sensor = degC
 Units RH_sensor = %
 Units e_sensor = kPa
-Dim es_sensor                                    'Temperature/humidity probe saturation vapor pressure.
-Dim rho_d_sensor                                 'Density of dry air used in Webb et al. term [kg / m^3].
+Dim es_sensor                                  'Temperature/humidity probe saturation vapor pressure.
+Dim rho_d_sensor                          'Density of dry air used in Webb et al. term [kg / m^3].
 
-Dim stats_out_tmpr_rh(6)                         'Temperature/humidity probe statistics.
+Dim stats_out_tmpr_rh(6)                        'Temperature/humidity probe statistics.
 Alias stats_out_tmpr_rh(1) = Ta_sensor_mean      'Mean temperature/humidity probe temperature.
 Alias stats_out_tmpr_rh(2) = e_sensor_mean       'Mean temperature/humidity probe vapor pressure.
 Alias stats_out_tmpr_rh(3) = e_sat_sensor_mean   'Mean temperature/humidity probe saturation vapor pressure.
@@ -666,42 +688,31 @@ Const Tref = 20
 
 ' Variables
 
-'Public sws_cs650(NMBR_CS65X)           'Volumetric soil water content.
-'Public ec_cs650(NMBR_CS65X)            'Electrical conductivity.
-'Public T_cs650(NMBR_CS65X)             'Temperature.
-'Public perm_cs650(NMBR_CS65X)          'Permittivity.
-'Public PerAvg_cs650(NMBR_CS65X)        'Period average.
-'Public VoltR_cs650(NMBR_CS65X)         'Voltage ratio.
-'Dim cs65x_raw(6)
-'Units sws_cs650 = frac_v_wtr
-'Units ec_cs650 = dS/m
-'Units T_cs650 = degC
-'Units perm_cs650 = None
-'Units PerAvg_cs650 = us
-'Units VoltR_cs650 = None
-
 Public Sws_cs616_raw(NMBR_CS616)
 Public Sws_cs616_Tcorr(NMBR_CS616)
 Public Sws_cs616(NMBR_CS616)
-Alias Sws_cs616(1) = Sws_8cma
-Alias Sws_cs616(2) = Sws_8cmb
-Alias Sws_cs616(3) = Sws_8cmc
-Alias Sws_cs616(4) = Sws_8cmd
+Alias Sws_cs616(1) = Sws_10cma
+Alias Sws_cs616(2) = Sws_10cmb
+Alias Sws_cs616(3) = Sws_40cm
+Alias Sws_cs616(4) = Sws_100cm
+Alias Sws_cs616(5) = Sws_120cma
+Alias Sws_cs616(6) = Sws_120cmb
+Alias Sws_cs616(7) = Sws_140cma
+Alias Sws_cs616(8) = Sws_140cmb
+
 Units Sws_cs616 = m^3/m^3
 
 ' -> Soil heat flux variables
 
-Public shf(NMBR_SHF)               'HFP01 soil heat flux plates.
+Public shf(NMBR_SHF)                   ' HFP01 soil heat flux plates.
 Units shf = W/m^2
+Dim shf_cal(NMBR_SHF)
 
-' -> Barometric pressure internal variables
-Public ps_sensor 'CS106 Barometric pressure at station level
-Units ps_sensor = kPa
-
-
-' -> Quantum flux variables
-Public Fpard
-Units Fpard = umol/m^2/s
+' -> Quantum flux variables ***
+Public Fpar(2)
+Alias Fpar(1) = Fpard    ' Downwelling PPFD
+Alias Fpar(2) = Fparu    ' Upwelling PPFD
+Units Fpar = umol/m^2/s
 
 '*** End internal constants, variables, working data tables ***
 '############################################################################
@@ -727,7 +738,7 @@ PipeLineMode
 DataTable (TERNflux,TRUE,FLUX_SIZE_CPU)
   DataInterval (0,OUTPUT_INTERVAL,Min,10)
   CardOut (0,FLUX_SIZE_CRD)
-
+  
   '*** Beginning of CSAT3B output data ***
   Sample (18,Fh,IEEE4)
   Average (4,Ux,IEEE4,sonic_disable_f)
@@ -780,14 +791,7 @@ DataTable (TERNflux,TRUE,FLUX_SIZE_CPU)
   Sample (NMBR_TSOIL,del_Tsoil(1),IEEE4)
   '*** End of soil T output data ***
 
-'  '*** Beginning of soil moisture output data ***
-'  Average (NMBR_CS65X,sws_cs650(1),IEEE4,slowsequence_disable_f)
-'  Average (NMBR_CS65X,ec_cs650(1),IEEE4,slowsequence_disable_f)
-'  Average (NMBR_CS65X,T_cs650(1),IEEE4,slowsequence_disable_f)
-'  Average (NMBR_CS65X,perm_cs650(1),IEEE4,slowsequence_disable_f)
-'  Average (NMBR_CS65X,PerAvg_cs650(1),IEEE4,slowsequence_disable_f)
-'  Average (NMBR_CS65X,VoltR_cs650(1),IEEE4,slowsequence_disable_f)
-  
+  '*** Beginning of soil moisture output data ***
   Average (NMBR_CS616,Sws_cs616_raw(1),IEEE4,slowsequence_disable_f)
   Average (NMBR_CS616,Sws_cs616(1),IEEE4,slowsequence_disable_f)
   '*** End of soil moisture output data ***
@@ -802,12 +806,8 @@ DataTable (TERNflux,TRUE,FLUX_SIZE_CPU)
   '*** End of precipitation output data ***
 
   '*** Beginning of PAR output data ***
-  Average (1,Fpard,IEEE4,slowsequence_disable_f)
+  Average (2,Fpar(),IEEE4,slowsequence_disable_f)
   '*** End of PAR output data ***
-
-  '*** Beginning of barometric pressure sensor output data ***
-  Average (1,ps_sensor,IEEE4,slowsequence_disable_f)
-  '*** End of barometric pressure sensor output data ***
 
   '*** Beginning of other output data ***
   Average (1,Tpanel,IEEE4,FALSE)
@@ -819,6 +819,17 @@ DataTable (TERNflux,TRUE,FLUX_SIZE_CPU)
 
   Totalize (1,n,IEEE4,slowsequence_disable_f)
   FieldNames ("slowsequence_Tot")
+EndTable
+
+DataTable (UWAflux,TRUE,FLUX_SIZE_CPU)
+  DataInterval (0,OUTPUT_INTERVAL,Min,10)
+  CardOut (0,FLUX_SIZE_CRD)
+  
+  '*** Beginning of additonal temperature and humidity probe output data ***
+  Average (3,tmpr_rh_2,IEEE4,slowsequence_disable_f)
+  FieldNames ("Ta_HMP_2m,RH_HMP_2m,AH_HMP_2m")
+  '*** End of temperature and humidity probe output data ***
+
 EndTable
 
 'Diagnostic data.
@@ -841,7 +852,7 @@ DataTable (ts_data,TRUE,-1)
   Sample (4,irga_raw(1),IEEE4)
   FieldNames ("CO2,H2O,amb_press_irga,sig_str_irga")
   '*** End of LI-7500(RS) time series output ***
-
+  
 EndTable
 
 '*** End output data tables ***
@@ -854,10 +865,10 @@ Sub file_rename()
   ' This subroutine creates a new filename and renames the file output to the card by tablefile
   SplitStr(timearray(),TERNflux.TimeStamp(3,2),"",6,0)
   NewFileName = _
-  "CRD:TOB3_"&STATION_NAME&"_"&SCAN_INTERVAL&"ms_"&timearray(3)&"_"& _
-  FormatFloat(timearray(2),"%02.0f")&"_"& _
-  FormatFloat(timearray(1),"%02.0f")&".dat"
-  FileRename(PrevFileName, NewFileName)
+"CRD:TOB3_"&STATION_NAME&"_"&SCAN_INTERVAL&"ms_"&timearray(3)&"_"& _
+FormatFloat(timearray(2),"%02.0f")&"_"& _
+FormatFloat(timearray(1),"%02.0f")&".dat"
+FileRename(PrevFileName, NewFileName)
 EndSub
 
 '*** End subroutines ***
@@ -867,6 +878,11 @@ EndSub
 '*** Program ***
 
 BeginProg
+
+  ' Load NMBR_SHF plate calibration.
+  For i = 1 To NMBR_SHF
+    Read shf_cal(i)
+  Next i
 
   'Set the SDM clock speed.
   SDMSpeed (SDM_PER)
@@ -898,6 +914,13 @@ BeginProg
     '*** Beginning of rain gauge measurement ***
     PulseCount (rain,1,RAIN_PULSE_INPUT,1,0,RAIN_CAL,0)
     '*** End of rain gauge measurement ***
+
+    '    '*** Beginning of independent wind speed and direction measurement
+    '    PulseCount(WS_AUX,1,WIND_SPD_PULSE_INPUT,5,1,0.098,0)
+    '    BrHalf (WD_AUX,1,AutoRange,WIND_DIR_ANALOG_INPUT,WIND_DIR_VX_PORT,1,WIND_DIR_VX_MV,True,0,ANALOG_INTEGRATION,355,0)
+    '    If WD_AUX >=360 Then WD_AUX = 0
+    '    If WD_AUX <0 Then WD_AUX = 0
+    '    '*** End of independent wind speed and direction
 
     'Save time series data.
     CallTable ts_data
@@ -1058,6 +1081,7 @@ BeginProg
       '*** End of soil temperature processing ***
 
       CallTable TERNflux
+      CallTable UWAflux
       If ( TERNflux.Output(1,1) ) Then
         diag_sonic_aggregate = 0
         diag_irga_aggregate = 0
@@ -1070,7 +1094,7 @@ BeginProg
       EndIf
 
     Else
-      scan_count += 1 'Increments until reaches the value of OFFSET
+      scan_count += 1 'Increments until reaches the value of OFFSET 
     EndIf
 
     CallTable diagnostic
@@ -1101,29 +1125,14 @@ BeginProg
     '*** Beginning of CR1000X measurements ***
 
     '*** Beginning of SHF measurements ***
-    VoltDiff (shf(1),NMBR_SHF,mV200C,SHF_ANALOG_INPUT,True,0,ANALOG_INTEGRATION,SHF_CAL,0)
-    '*** End of SHF measurements ***
-
-    '*** Beginning of barometric pressure measurements ***
-    VoltDiff (ps_sensor),1,mV5000,PS_ANALOG_INPUT,True,0,ANALOG_INTEGRATION,PS_MULT,PS_OFFSET)
-    ps_sensor = ps_sensor * 0.1
+    VoltDiff (shf(),NMBR_SHF,mV200C,SHF_ANALOG_INPUT,True,0,ANALOG_INTEGRATION,shf_cal(),0)
+    
     '*** End of SHF measurements ***
 
     '*** Beginning of soil temperature measurements ***
-    TCDiff (Tsoil,NMBR_TSOIL,mV5000,TSOIL_ANALOG_INPUT,TypeE,Tpanel,True,0,ANALOG_INTEGRATION,1.0,0)
+    TCDiff (Tsoil,NMBR_TSOIL,mV200c,TSOIL_ANALOG_INPUT,TypeE,Tpanel,True,0,ANALOG_INTEGRATION,1.0,0)
     '*** End of soil temperature measurements ***
-
-'    '*** Beginning of CS65X measurements ***
-'    SDI12Recorder (cs65x_raw(1),CS65X_SDI12_PORT,CS65X_1_ADDR,"M3!",1,0)
-'    sws_cs650(1) = cs65x_raw(1)
-'    ec_cs650(1) = cs65x_raw(2)
-'    T_cs650(1) = cs65x_raw(3)
-'    perm_cs650(1) = cs65x_raw(4)
-'    PerAvg_cs650(1) = cs65x_raw(5)
-'    VoltR_cs650(1) = cs65x_raw(6)
-'    'Duplicate above for additional probes.
-'    '*** End of CS65X measurements ***
-
+    
     '*** Beginning of CS616 measurements ***
     PeriodAvg (Sws_cs616_raw,NMBR_CS616,mV5000,VWC_ANALOG_INPUT,0,0,5,10,1,0)
     For i = 1 To NMBR_CS616
@@ -1171,7 +1180,8 @@ BeginProg
     '*** End of additional temperature and humidity probe measurements ***
 
     '*** Beginning of quantum sensor measurements ***
-    CDM_VoltDiff (VOLT116,1,Fpard,1,AutoRange,PAR_ANALOG_INPUT,True,0,ANALOG_INTEGRATION,PAR_MULT,0)
+    CDM_VoltDiff (VOLT116,1,Fpard,1,AutoRange,PAR_ANALOG_INPUT,True,0,ANALOG_INTEGRATION,PAR_CAL_1,0)
+        CDM_VoltDiff (VOLT116,1,Fparu,1,AutoRange,PAR_ANALOG_INPUT + 1,True,0,ANALOG_INTEGRATION,PAR_CAL_2,0)
     '*** End of quantum sensor measurements ***
 
     '*** End of CDM-VOLT116 measurements ***
