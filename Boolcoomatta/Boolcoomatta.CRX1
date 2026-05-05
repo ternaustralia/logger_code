@@ -282,7 +282,7 @@ Const NR_LW_OUTGOING_CAL = 1000/9.81    'Unique multiplier for CNR 4 longwave ou
 
 Const OFFSET = 17                                                  'An offset delay that will be introduced to the eddy covariance data used to compute online fluxes.
 Const SCAN_BUFFER_SIZE = 60*INT (1000/SCAN_INTERVAL)               'Compute a 60 second scan buffer.
-Const NUM_DAY_CPU = 1                                              'Number of days of flux data to store on the CPU.
+Const NUM_DAY_CPU = 14                                             'Number of days of flux data to store on the CPU.
 Const FLUX_SIZE_CPU = Ceiling ((NUM_DAY_CPU*1440)/OUTPUT_INTERVAL) 'Size of flux data table on CPU [days].
 Const FLUX_SIZE_CRD = Ceiling ((NUM_DAY_CRD*1440)/OUTPUT_INTERVAL) 'Size of flux data table on CRD [days].
 
