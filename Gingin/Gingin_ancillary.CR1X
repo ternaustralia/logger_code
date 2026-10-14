@@ -1,0 +1,390 @@
+'CR1000X Series Datalogger
+
+'Date: 14/10/2026
+'Program author: Ian McHugh
+
+'General                    -> Station-based user constants: "Station-based user constants"
+'                           -> Other user constants: "General user constants"
+'                           -> Scientific constants: "Scientific constants"
+
+'VOLT116                    -> User constants: "VOLT116 user constants"
+
+'Wind sensor                -> User constants and wiring: "Wind sensor user constants / wiring"
+'                           -> Internal variables: "Wind sensor internal variables"
+
+'CosmOz sensor              -> User constants and wiring: "CosmOz neutron sensor user constants / wiring"
+'                           -> Internal variables: "CosmOz neutron sensor internal variables"
+
+'Air temperature / humidity -> User constants and wiring: "T and RH user constants / wiring"
+'                           -> Internal variables and tables: "T and RH internal variables"
+
+'############################################################################
+
+'############################################################################
+' *** Begin user-customised station / logger / instrument constants and wiring ***
+
+' -> Station-based user constants
+Const STATION_NAME = "Gingin_ancillary"
+Const PAKBUS_ADDR = 4
+
+' -> General user constants
+Const ANALOG_INTEGRATION = _50Hz       ' Slow sequence analog measurement integration time, _60Hz or _50Hz.
+Const SLOW_SCAN_INTERVAL = 10          ' Unique value, measurement rate (s)
+Const ANCILLARY_OUTPUT_INTERVAL = 30   ' Unique value, ancillary data output interval in minutes.
+Const COSMOZ_OUTPUT_INTERVAL = 60      ' Unique value, CosmOz output interval in minutes.
+
+' -> VOLT116 user constants (constants only - wiring N/A, connection via CPI)
+
+Const CDMVOLT116_1_SN = 8344              ' CDM-VOLT116 serial number
+Const CDMVOLT116_1_ADDR = 1               ' CDM-VOLT116 CPI address
+Const CDMVOLT116_1_DESC = "MUX_1"         ' CDM-VOLT116 descriptor
+
+' -> Ancillary wind sensor user constants / wiring (CR1000X)
+
+Const WSD_2m_ADDR = 1              'SDI-12 address
+Const WSD_2m_SDI12_PORT = C1       'Measurement port
+Const WSD_2m_FIELDS = "Ws_2m_Av,Wd_2m_Av,Wd_2m_Sd"
+
+Const WSD_4m_ADDR = 2              'SDI-12 address
+Const WSD_4m_SDI12_PORT = C1       'Measurement port
+Const WSD_4m_FIELDS = "Ws_4m_Av,Wd_4m_Av,Wd_4m_Sd"
+
+Const WSD_7m_ADDR = 3              'SDI-12 address
+Const WSD_7m_SDI12_PORT = C3       'Measurement port
+Const WSD_7m_FIELDS = "Ws_7m_Av,Wd_7m_Av,Wd_7m_Sd"
+
+Const WSD_10m_ADDR = 4              'SDI-12 address
+Const WSD_10m_SDI12_PORT = C3       'Measurement port
+Const WSD_10m_FIELDS = "Ws_10m_Av,Wd_10m_Av,Wd_10m_Sd"
+
+'C1 / C3 SDI-12 data (green)
+'12V     SDI-12 power (red)
+'G       SDI-12 power reference (black)
+'        Shield (clear)
+
+' -> CosmOz neutron sensor user constants / wiring
+Const COSMOZ_RS232_PORT = ComRS232
+
+' -> T and RH user constants / wiring (VOLT116)
+
+Const T_RH_2m_INPUT = 1          'Unique differential input channel for temperature and humidity probe.
+Const T_RH_4m_INPUT = 3          'Unique differential input channel for temperature and humidity probe.
+Const T_RH_7m_INPUT = 5          'Unique differential input channel for temperature and humidity probe.
+Const T_RH_10m_INPUT = 7          'Unique differential input channel for temperature and humidity probe.
+
+Const T_RH_T_MULT = 0.14           'Unique multiplier for temperature; HC2S3 = 0.1, HMP155A = 0.14, or HMP45C = 0.1.
+Const T_RH_T_OFFSET = -80          'Unique offset for temperature; HC2S3 = -40, HMP155A = -80, or HMP45C = -40.
+Const T_RH_RH_MULT = 0.1           'Unique multiplier for rh; HC2S3 = ?, HMP155A = 0.001, or HMP45C = ?.
+Const T_RH_RH_OFFSET = 0           'Unique offset for rh; HC2S3 = ?, HMP155A = 0, or HMP45C = ?.
+
+'1H      Temperature signal 2m (yellow)
+'1L      Temperature signal reference 2m (white)
+'gnd     Shield
+'2H      RH signal 2m (blue)
+'2L      RH signal reference 2m (jumper from temperature signal reference)
+'12V     Power (red)
+'G       Power reference (black)
+
+'3H      Temperature signal 4m (yellow)
+'3L      Temperature signal reference 4m (white)
+'gnd     Shield
+'4H      RH signal 4m (blue)
+'4L      RH signal reference 4m (jumper from temperature signal reference)
+'12V     Power (red)
+'G       Power reference (black)
+
+'5H      Temperature signal 7m (yellow)
+'5L      Temperature signal reference 7m (white)
+'gnd     Shield
+'6H      RH signal 7m (blue)
+'6L      RH signal reference 7m (jumper from temperature signal reference)
+'12V     Power (red)
+'G       Power reference (black)
+
+'7H      Temperature signal 10m (yellow)
+'7L      Temperature signal reference 10m (white)
+'gnd     Shield
+'8H      RH signal 10m (blue)
+'8L      RH signal reference 10m (jumper from temperature signal reference)
+'12V     Power (red)
+'G       Power reference (black)
+
+' *** End user-customised station / logger / instrument constants and wiring ***
+' *** CUSTOMISE THE BELOW AT YOUR OWN RISK!!!
+'############################################################################
+
+'############################################################################
+' *** Begin internal constants, variables, working data tables ***
+
+' -> Logger diagnostic variables
+Public Tpanel
+Public Vbat
+Units Tpanel = degC
+Units Vbat = V
+
+' -> Wind sensor internal variables
+
+' WindSonic4 2m
+Public Wsd_2m(3)
+Alias Wsd_2m(1) = Wd_2m
+Alias Wsd_2m(2) = Ws_2m
+Alias Wsd_2m(3) = Wdiag_2m
+Units Wd_2m = degrees
+Units Ws_2m = m/s
+Dim Disable_Flag_Wsd_2m As Boolean
+
+' WindSonic4 4m
+Public Wsd_4m(3)
+Alias Wsd_4m(1) = Wd_4m
+Alias Wsd_4m(2) = Ws_4m
+Alias Wsd_4m(3) = Wdiag_4m
+Units Wd_4m = degrees
+Units Ws_4m = m/s
+Dim Disable_Flag_Wsd_4m As Boolean
+
+' WindSonic4 7m
+Public Wsd_7m(3)
+Alias Wsd_7m(1) = Wd_7m
+Alias Wsd_7m(2) = Ws_7m
+Alias Wsd_7m(3) = Wdiag_7m
+Units Wd_7m = degrees
+Units Ws_7m = m/s
+Dim Disable_Flag_Wsd_7m As Boolean
+
+' WindSonic4 10m
+Public Wsd_10m(3)
+Alias Wsd_10m(1) = Wd_10m
+Alias Wsd_10m(2) = Ws_10m
+Alias Wsd_10m(3) = Wdiag_10m
+Units Wd_10m = degrees
+Units Ws_10m = m/s
+Dim Disable_Flag_Wsd_10m As Boolean
+
+' -> CosmOz neutron sensor internal variables
+Dim tubeResponse As String         'String returned by RS232 coms with tubes
+Public NPM_Temp_RH(2) : Alias NPM_Temp_RH = NPM_Temp, NPM_RH
+Public NPMCnts(3) : Alias NPMCnts = NPMCounts, NPMSecs, NPMNumCalls
+Public NCtRate                     'neutron count rate (counts/sec)
+
+' -> T and RH internal variables
+
+'2m
+Public T_RH_2m(2)
+Alias T_RH_2m(1) = Ta_2m                    'Temperature/humidity probe temperature.
+Alias T_RH_2m(2) = RH_2m                    'Temperature/humidity probe relative humidity.
+Units Ta_2m = degC
+Units RH_2m = percent
+
+'4m
+Public T_RH_4m(2)
+Alias T_RH_4m(1) = Ta_4m                    'Temperature/humidity probe temperature.
+Alias T_RH_4m(2) = RH_4m                    'Temperature/humidity probe relative humidity.
+Units Ta_4m = degC
+Units RH_4m = percent
+
+'7m
+Public T_RH_7m(2)
+Alias T_RH_7m(1) = Ta_7m                    'Temperature/humidity probe temperature.
+Alias T_RH_7m(2) = RH_7m                    'Temperature/humidity probe relative humidity.
+Units Ta_7m = degC
+Units RH_7m = percent
+
+'10m
+Public T_RH_10m(2)
+Alias T_RH_10m(1) = Ta_10m                  'Temperature/humidity probe temperature.
+Alias T_RH_10m(2) = RH_10m                  'Temperature/humidity probe relative humidity.
+Units Ta_10m = degC
+Units RH_10m = percent
+
+'*** End internal constants, variables, working data tables ***
+'############################################################################
+
+'############################################################################
+'*** Begin hardware config section ***
+
+CPIAddModule(VOLT116,CDMVOLT116_1_SN,CDMVOLT116_1_DESC,CDMVOLT116_1_ADDR)  ' Add CPI module for expanded measurements
+SetSetting ("StationName",STATION_NAME)                     'Station name
+SetSetting ("PakBusAddress",PAKBUS_ADDR)                    'Pakbus address
+PipeLineMode
+
+'*** End hardware config section ***
+'############################################################################
+
+'############################################################################
+'*** Begin output data tables ***
+
+'Ancillary data table
+DataTable (ancillary_data,1,-1) 'Set table size to # of records, or -1 to autoallocate.
+ DataInterval (0,ANCILLARY_OUTPUT_INTERVAL,Min,10)
+  
+    '*** Beginning of ancillary wind output data ***
+  
+  '2m
+  WindVector(1,Ws_2m,Wd_2m,IEEE4,Disable_Flag_Wsd_2m,0,0,0)
+  FieldNames(WSD_2m_FIELDS)
+  
+  '2m
+  WindVector(1,Ws_4m,Wd_4m,IEEE4,Disable_Flag_Wsd_4m,0,0,0)
+  FieldNames(WSD_4m_FIELDS)
+  
+  '7m
+  WindVector(1,Ws_7m,Wd_7m,IEEE4,Disable_Flag_Wsd_7m,0,0,0)
+  FieldNames(WSD_7m_FIELDS)
+  
+  '10m
+  WindVector(1,Ws_10m,Wd_10m,IEEE4,Disable_Flag_Wsd_10m,0,0,0)
+  FieldNames(WSD_10m_FIELDS)
+
+  '*** End of ancillary wind output data ***
+
+  '*** Beginning of temperature and humidity probe output data ***
+  
+  Average (2,T_RH_2m(1),IEEE4,False)
+  Average (2,T_RH_4m(1),IEEE4,False)
+  Average (2,T_RH_7m(1),IEEE4,False)
+  Average (2,T_RH_10m(1),IEEE4,False)
+  
+  '*** End of temperature and humidity probe output data ***  
+	
+	Minimum (1,Vbat,FP2,False,False)
+	Sample (1,Tpanel,FP2)
+EndTable
+
+DataTable (NPMHourly,True,-1 )
+  DataInterval (0,COSMOZ_OUTPUT_INTERVAL,Min,10)
+  Average (1,Tpanel,IEEE4,False)                            ' Panel temperature
+  Sample (1,Vbat,FP2)                                       ' Logger battery voltage
+  Minimum (1,Ta_10m,IEEE4,0,False)                          ' Air temperature minimum
+  Average (1,Ta_10m,IEEE4,False)                            ' Air temperature average
+  Maximum (1,Ta_10m,IEEE4,0,False)                          ' Air temperature maximum
+  Minimum (1,RH_10m,IEEE4,0,False)                          ' Relative humidity minimum
+  Average (1,RH_10m,IEEE4,False)                            ' Relative humidity average
+  Maximum (1,RH_10m,IEEE4,0,False)                          ' Relative humidity maximum
+  'Sample (1,ps,IEEE4)                                      ' Barometric Pressure
+  'Totalize (1,rainfall,FP2,False)                          ' Rainfall
+  Totalize(1,NPMCnts(1),Long,False)                         ' Total number of NPM counts this hour
+  Totalize(1,NPMCnts(2),Long,False)                         ' Total number of seconds NPM has counted for this hour (should be 3600 seconds of counting in an hour unless something has gone wrong)
+  Minimum(1,NPM_Temp_RH(1),IEEE4,False,False)               ' NPM tube temperature minimum
+  Average(1,NPM_Temp_RH(1),IEEE4,False)                     ' NPM tube temperature average
+  Maximum(1,NPM_Temp_RH(1),IEEE4,False,False)               ' NPM tube temperature maximum
+  Minimum(1,NPM_Temp_RH(2),IEEE4,False,False)               ' NPM tube relative humidity minimum
+  Average(1,NPM_Temp_RH(2),IEEE4,False)                     ' NPM tube relative humidity average
+  Maximum(1,NPM_Temp_RH(2),IEEE4,False,False)               ' NPM tube relative humidity maximum
+EndTable
+
+'Main Program
+BeginProg
+	Scan (10,Sec,0,0)
+
+    SerialOpen (ComRS232,115200,0,0,50)
+    
+    '*** Beginning of CR1000X measurements ***
+
+    'Datalogger panel temperature and battery voltage
+		PanelTemp (Tpanel,ANALOG_INTEGRATION)
+		Battery (Vbat)
+
+    '*** Beginning of WindSonic4 measurements ***
+    
+    '2m
+    
+    ' Measure the sensor
+    SDI12Recorder (Wsd_2m(1),WSD_2m_SDI12_PORT,WSD_2m_ADDR,"R0!",1.0,0)
+    
+    ' Check the data from the WindSonic4 2D sonic anemometer
+    If (Ws_2m = NaN) Then
+      Wd_2m = NaN
+      Wdiag_2m = NaN
+    EndIf
+    Disable_Flag_Wsd_2m = (Wd_2m = NaN) OR (Wdiag_2m <> 0)
+    
+    '4m
+    
+    ' Measure the sensor
+    SDI12Recorder (Wsd_4m(1),WSD_4m_SDI12_PORT,WSD_4m_ADDR,"R0!",1.0,0)
+    
+    ' Check the data from the WindSonic4 2D sonic anemometer
+    If (Ws_4m = NaN) Then
+      Wd_4m = NaN
+      Wdiag_4m = NaN
+    EndIf
+    Disable_Flag_Wsd_4m = (Wd_4m = NaN) OR (Wdiag_4m <> 0)
+
+    '7m
+    
+    ' Measure the sensor
+    SDI12Recorder (Wsd_7m(1),WSD_7m_SDI12_PORT,WSD_7m_ADDR,"R0!",1.0,0)
+    
+    ' Check the data from the WindSonic4 2D sonic anemometer
+    If (Ws_7m = NaN) Then
+      Wd_7m = NaN
+      Wdiag_7m = NaN
+    EndIf
+    Disable_Flag_Wsd_7m = (Wd_7m = NaN) OR (Wdiag_7m <> 0)
+
+    '10m
+    
+    ' Measure the sensor
+    SDI12Recorder (Wsd_10m(1),WSD_10m_SDI12_PORT,WSD_10m_ADDR,"R0!",1.0,0)
+    
+    ' Check the data from the WindSonic4 2D sonic anemometer
+    If (Ws_10m = NaN) Then
+      Wd_10m = NaN
+      Wdiag_10m = NaN
+    EndIf
+    Disable_Flag_Wsd_10m = (Wd_10m = NaN) OR (Wdiag_10m <> 0)
+
+    '*** End of WindSonic4 measurements ***
+
+
+    '*** Beginning of CosmOz measurements ***
+
+    ' Measure and process the CosmOz output
+    SerialFlush (COSMOZ_RS232_PORT)
+    SerialOut (COSMOZ_RS232_PORT,"QXC" + CHR(13) + CHR(10),"",0,0.1)    'Measure counter
+    SerialIn (tubeResponse,COSMOZ_RS232_PORT,100,CHR(10),1000)          'Read in the sent command that's echoed back (and throwaway)
+    SerialIn (tubeResponse,COSMOZ_RS232_PORT,100,CHR(10),1000)          'Read in the response
+    SplitStr (NPMCnts(),COSMOZ_RS232_PORT,"",2,0)                       'Split the numbers out of the response
+    NCtRate=NPMCnts(1)/NPMCnts(2)
+
+    SerialOut (COSMOZ_RS232_PORT,"QXS" + CHR(13) + CHR(10),"",0,0.1)    'Measure sensor (Temp/RH)
+    SerialIn (tubeResponse,COSMOZ_RS232_PORT,100,CHR(10),1000)
+    SerialIn (tubeResponse,COSMOZ_RS232_PORT,100,CHR(10),1000)
+    SplitStr (NPM_Temp_RH(),tubeResponse,"",2,0)
+
+
+    '*** End of CosmOz measurements ***
+    
+    '*** End of CR1000X measurements ***
+
+    '*** Beginning of CDM-VOLT116 measurements ***
+
+    '*** Beginning of temperature and humidity probe measurements ***
+    
+    '2m
+    CDM_VoltDiff (VOLT116,1,Ta_2m,1,AutoRange,T_RH_2m_INPUT,True,0,ANALOG_INTEGRATION,T_RH_T_MULT,T_RH_T_OFFSET)
+    CDM_VoltDiff (VOLT116,1,RH_2m,1,AutoRange,T_RH_2m_INPUT+1,True,0,ANALOG_INTEGRATION,T_RH_RH_MULT,T_RH_RH_OFFSET)
+    
+    '4m
+    CDM_VoltDiff (VOLT116,1,Ta_4m,1,AutoRange,T_RH_4m_INPUT,True,0,ANALOG_INTEGRATION,T_RH_T_MULT,T_RH_T_OFFSET)
+    CDM_VoltDiff (VOLT116,1,RH_4m,1,AutoRange,T_RH_4m_INPUT+1,True,0,ANALOG_INTEGRATION,T_RH_RH_MULT,T_RH_RH_OFFSET)
+
+    '7m
+    CDM_VoltDiff (VOLT116,1,Ta_7m,1,AutoRange,T_RH_7m_INPUT,True,0,ANALOG_INTEGRATION,T_RH_T_MULT,T_RH_T_OFFSET)
+    CDM_VoltDiff (VOLT116,1,RH_7m,1,AutoRange,T_RH_7m_INPUT+1,True,0,ANALOG_INTEGRATION,T_RH_RH_MULT,T_RH_RH_OFFSET)
+    
+    '10m
+    CDM_VoltDiff (VOLT116,1,Ta_10m,1,AutoRange,T_RH_10m_INPUT,True,0,ANALOG_INTEGRATION,T_RH_T_MULT,T_RH_T_OFFSET)
+    CDM_VoltDiff (VOLT116,1,RH_10m,1,AutoRange,T_RH_10m_INPUT+1,True,0,ANALOG_INTEGRATION,T_RH_RH_MULT,T_RH_RH_OFFSET)
+
+    '*** End of temperature and humidity probe measurements ***
+
+    '*** End of CDM-VOLT116 measurements ***
+
+    ' Call tables
+		CallTable ancillary_data
+    CallTable NPMHourly		
+
+	NextScan
+EndProg
+
