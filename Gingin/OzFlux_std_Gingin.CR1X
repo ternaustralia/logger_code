@@ -1,4 +1,4 @@
-'CR6 Datalogger
+'CR1000X Datalogger
 ' The datalogger type listed on line 1 determines the default instruction set,
 ' compiler, and help files used for a program that uses the .DLD or .CRB program
 ' extension. These options can also be set using the Set Datalogger Type dialog box
@@ -113,7 +113,7 @@ Const CDMVOLT116_1_DESC = "MUX_1"         ' CDM-VOLT116 descriptor
 '    are combined at top of mast and brought down to logger on a single cable 
 '    for tall towers; as such, wiring colours may vary for cabling used).
 
-Const CSAT3B_SDM_ADDR = 3          ' CSAT3B SDM address
+Const CSAT3B_SDM_ADDR = 3          ' CSAT3B SDM address. SN: 
 Const AZ_SONIC = 180                ' CSAT3B azimuth
 
 'SDM-C1  SDM Data (green)
@@ -128,7 +128,7 @@ Const AZ_SONIC = 180                ' CSAT3B azimuth
 
 ' -> LI7500RS user constants / wiring (CR1000X - as per CSAT above)
 
-Const LI7500_SDM_ADDR = 7          ' IRGA SDM address
+Const LI7500_SDM_ADDR = 7          ' IRGA SDM address. SN: AIU 2121, 75H-3053
 Const IRGA_SIG_STR_THRESHOLD = 60  ' Unique value - filter LI-7500(RS) data with signal strength < SIG_STR_THRESHOLD.
 
 'SDM-C1  SDM Data (gray/blue)
@@ -145,9 +145,9 @@ Const IRGA_SIG_STR_THRESHOLD = 60  ' Unique value - filter LI-7500(RS) data with
 
 Const NMBR_CS65X = 3                  'Number of CS65X to measure.
 Const CS65X_SDI12_PORT = C5           'Measurement port.
-Const CS65X_1_ADDR = 1                'Address for this probe.
-Const CS65X_2_ADDR = 2                'Address for this probe.
-Const CS65X_3_ADDR = 3                'Address for this probe.
+Const CS65X_1_ADDR = 1                'Address for this probe. SN: 14035
+Const CS65X_2_ADDR = 2                'Address for this probe. SN: 
+Const CS65X_3_ADDR = 3                'Address for this probe. SN:
 
 'Search for text "Duplicate above for additional probes." to add code for additional probes.
 
@@ -167,7 +167,7 @@ Const CS65X_3_ADDR = 3                'Address for this probe.
 'example, If the WindSonic4 Is connected To C3 on a CR1000X, C4 cannot be used in the
 'TimerInput(), PulseCount(), OR WaitDigTrig() instructions. 
 
-Const RAIN_PULSE_INPUT = P1        'Unique pulse input channel for tipping bucket.
+Const RAIN_PULSE_INPUT = P1        'Unique pulse input channel for tipping bucket. SN: 
 Const RAIN_CAL = 0.2               'Unique multiplier for tipping bucket.
 
 'P1      Signal (black)
@@ -176,7 +176,7 @@ Const RAIN_CAL = 0.2               'Unique multiplier for tipping bucket.
 
 ' -> Ancillary wind sensor user constants / wiring (CR1000X)
 
-Const WSD_AUX_ADDR = 0              'SDI-12 address
+Const WSD_AUX_ADDR = 0              'SDI-12 address. SN: 
 Const WSD_AUX_SDI12_PORT = C7       'Measurement port
 Const WSD_AUX_FIELDS = "Ws_Av,Wd_Av,Wd_Sd"
 
@@ -194,7 +194,7 @@ Const InitWaterRL = 3.363                            'CS451 reading at install (
 Const CS451_AHDAdj = AHDGL - Init_DTW - InitWaterRL  'Sensor elevation, m AHD (33.477)
 Const CS451_DTWAdj = Init_DTW + InitWaterRL          'Sensor depth below ground, m (13.173)
 Const WDT_SDI12_PORT = C7
-Const WDT_ADDR = "A"
+Const WDT_ADDR = "A"                                 'SDI-12 address SN: 70013279
 
 'C7      SDI-12 data (white)
 '12V     SDI-12 power (red)
@@ -208,9 +208,9 @@ Const WDT_ADDR = "A"
 Const SHF_ANALOG_INPUT = 1                  'Unique single-ended analog input channel.
 Const NMBR_SHF = 3                          'n plates
 Const SHF_FIELDS = "Fg_01,Fg_02,Fg_03"      'Field names
-Const SHF_CAL_1 = 1000/64.96                'Unique multiplier for HFP #1 (1000/sensitivity). SN 4240
-Const SHF_CAL_2 = 1000/62.60                'Unique multiplier for HFP #2 (1000/sensitivity).
-Const SHF_CAL_3 = 1000/58.55                'Unique multiplier for HFP #2 (1000/sensitivity).
+Const SHF_CAL_1 = 1000/61.19                'Unique multiplier for HFP #1 (1000/sensitivity). SN 16735
+Const SHF_CAL_2 = 1000/60.51                'Unique multiplier for HFP #2 (1000/sensitivity). SN 16736
+Const SHF_CAL_3 = 1000/60.65                'Unique multiplier for HFP #2 (1000/sensitivity). SN 16737
 Data SHF_CAL_1
 Data SHF_CAL_2
 Data SHF_CAL_3
@@ -266,7 +266,7 @@ Const T_RH_RH_OFFSET = 0           'Unique offset for rh; HC2S3 = ?, HMP155A = 0
 
 Const NR_ANALOG_INPUT = 3                'Unique differential analog input channel for raw measurements
 Const NR_TSENS_ANALOG_INPUT = 13         'Unique single-ended analog input channel for body T
-Const NR_TSENS_VX = X1                   'Unique voltage excitation channel for thermistor
+Const NR_TSENS_VX = X2                   'Unique voltage excitation channel for thermistor
 Const NR_SW_INCOMING_CAL = 1000/14.24    'Unique multiplier for CNR 4 shortwave incoming radiation (1000/sensitivity) S/N 202464
 Const NR_SW_OUTGOING_CAL = 1000/11.86    'Unique multiplier for CNR 4 shortwave outgoing radiation (1000/sensitivity) S/N 202464
 Const NR_LW_INCOMING_CAL = 1000/14.57    'Unique multiplier for CNR 4 longwave incoming radiation (1000/sensitivity)  S/N 202464
@@ -288,7 +288,7 @@ Const NR_LW_OUTGOING_CAL = 1000/13.17    'Unique multiplier for CNR 4 longwave o
 '7H      Thermistor signal (white)
 'gnd     Thermistor signal reference (black)
 '        Shield (clear)
-'X1      Thermistor excitation (red)
+'X2      Thermistor excitation (red)
 
 ' -> quantum sensor user constants / wiring (VOLT116)
 
@@ -304,7 +304,7 @@ Const PAR_MULT = 5                 'Multiplier for Apogee SQ-110-SS quantum sens
 
 ' -> IR temperature sensor user constants / wiring (VOLT116)
 
-Const IR_TARGET_ANALOG_INPUT = 11         'Unique differential analog input channel for target measurement
+Const IR_TARGET_ANALOG_INPUT = 11         'Unique differential analog input channel for target measurement. SN: 5303
 Const IR_TBODY_ANALOG_INPUT = 23   'Unique single-ended analog input channel for body temperature measurement
 Const IR_TBODY_VX = X3
 
@@ -1264,3 +1264,4 @@ BeginProg
     slowsequence_finished_f = TRUE
   NextScan
 EndProg
+   ‰        
